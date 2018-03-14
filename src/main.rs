@@ -1,14 +1,14 @@
 #[macro_use]
 extern crate rouille;
-extern crate mersh;
 extern crate serde;
 extern crate serde_json;
+extern crate mersh_server;
 
 use std::sync::{Mutex};
 
 fn main() {
 
-    let interpreter = Mutex::new(mersh::interpreter::Interpreter::default());
+    let interpreter = Mutex::new(mersh_server::interpreter::Interpreter::default());
 
     rouille::start_server("localhost:8000", move |request| router!(request,
        (GET) (/) => {
@@ -30,7 +30,7 @@ fn main() {
 
             let input = try_or_400!(post_input!(request, { cmd: String }));
 
-            let cmd : mersh::interpreter::Cmd = serde_json::from_str(&input.cmd).unwrap();
+            let cmd : mersh_server::interpreter::Cmd = serde_json::from_str(&input.cmd).unwrap();
             interpreter.lock().unwrap().apply_cmd(cmd); // => when apply_cmd() panics, mutex is poisoned !
             rouille::Response::redirect_302("/")
 
