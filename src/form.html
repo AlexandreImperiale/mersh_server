@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <title>Mersh server</title>
+</head>
+<style>
+    input {
+      padding: 10px;
+      font-size: 1.2em;
+      width: 90%;
+      font-family: sans-serif;
+    }
+
+    input::placeholder-shown {
+      border-color: silver;
+    }
+
+    input::placeholder {
+      color: grey;
+    }
+</style>
+<body>
+    <form action="/" method="POST" enctype="multipart/form-data">
+        <p><input id="invite_cmd" type="text" name="cmd" placeholder="Add mersh command"/></p>
+    </form>
+</body>
+</html>
