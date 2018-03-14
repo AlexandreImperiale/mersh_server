@@ -1,0 +1,12 @@
+[package]
+name = "mersh_server"
+version = "0.1.0"
+authors = ["AlexandreImperiale <https://github.com/AlexandreImperiale>"]
+
+[dependencies]
+clippy = { version = "*", optional = true }
+mersh= { git = "https://github.com/AlexandreImperiale/mersh" }
+rouille = "2.1.0"
+serde = "1.0.29"
+serde_derive = "1.0.29"
+serde_json = "1.0.11"
