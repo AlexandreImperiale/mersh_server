@@ -1,0 +1,22 @@
+
+% ==============================================================================
+
+Starting React.js tutorial: https://reactjs.org/tutorial/tutorial.html
+
+1. Setting up environment
+  1.1 Installing Node.js
+    * Download page: https://nodejs.org/en/
+    * Gives access to Node.js "package ecosystem" through the npm command.
+
+  1.2 Creating a new react project.
+    * Installing packages required for creating a new react application.
+        > npm install -g create-react-app
+    * Creating a new project
+        > create-react-app my-app
+    * Last command may launch installation of react components, if not already installed.
+    * Modifying the index.css file in the src/ folder from the sources provided by the tutorial.
+    * Modifying the index.js file in the src/ folder from the sources provided by the tutorial.
+
+% ==============================================================================
+
+Starting webpack tutorial
