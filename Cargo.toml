@@ -5,8 +5,12 @@ authors = ["AlexandreImperiale <https://github.com/AlexandreImperiale>"]
 
 [dependencies]
 clippy = { version = "*", optional = true }
+iron = "0.6.0"
 mersh= { git = "https://github.com/AlexandreImperiale/mersh" }
-rouille = "2.1.0"
+mount = "0.4.0"
+router = "0.6.0"
 serde = "1.0.29"
 serde_derive = "1.0.29"
 serde_json = "1.0.11"
+staticfile = "0.5.0"
+url = "1.7.0"
