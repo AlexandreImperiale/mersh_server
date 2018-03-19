@@ -1,75 +1,33 @@
-#[macro_use]
-extern crate rouille;
-extern crate serde;
-extern crate serde_json;
-extern crate mersh_server;
-
-use std::sync::{Mutex};
+extern crate iron;
+extern crate mount;
+extern crate router;
+extern crate staticfile;
+extern crate url;
 
 fn main() {
 
-    let interpreter = Mutex::new(mersh_server::interpreter::Interpreter::default());
+    let mut mount = mount::Mount::new();
+    let mut router = router::Router::new();
 
-    rouille::start_server("localhost:8000", move |request| router!(request,
-       (GET) (/) => {
+    // Redirection: '/' -> '/index.html'
+    {
+        let handler = |_: &mut iron::Request|
+        {
+            let base_url = url::Url::parse("http://localhost:8000").unwrap();
+            let redirect_url = iron::Url::from_generic_url(base_url.join("/index.html").unwrap()).unwrap();
+            Ok(iron::Response::with((iron::status::Found, iron::modifiers::Redirect(redirect_url))))
+        };
+        router.route(iron::method::Get, "/", handler, "redirect_to_index");
+    }
 
-            let mut contents = String::from(HEAD);
-            contents.push_str("\n");
-            contents.push_str(STYLE);
-            contents.push_str("<body>\n");
-            for cmd in interpreter.lock().unwrap().cmd_history.iter() {
-               contents.push_str(&serde_json::to_string(cmd).unwrap());
-               contents.push_str("\n");
-            }
-            contents.push_str(CMD_FORM);
-            contents.push_str("</body>\n</html>");
+    // Mounting router and static file services.
+    mount
+        .mount("/", router)
+        .mount("/index.html", staticfile::Static::new(std::path::Path::new("src/front/index.html")))
+        .mount("/static/bundle.js", staticfile::Static::new(std::path::Path::new("src/front/bundle.js")));
 
-            rouille::Response::html(contents)
-         },
-       (POST) (/) => {
-
-            let input = try_or_400!(post_input!(request, { cmd: String }));
-
-            let cmd : mersh_server::interpreter::Cmd = serde_json::from_str(&input.cmd).unwrap();
-            interpreter.lock().unwrap().apply_cmd(cmd); // => when apply_cmd() panics, mutex is poisoned !
-            rouille::Response::redirect_302("/")
-
-         },
-       _ => rouille::Response::empty_404()
-    ));
+    // Creating iron http server.
+    iron::Iron::new( mount)
+        .http("localhost:8000")
+        .unwrap();
 }
-
-// The HTML document of the home page.
-static HEAD: &'static str = r#"
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="styles.css">
-    <title>Mersh server</title>
-</head>"#;
-
-static STYLE: &'static str = r#"
-<style>
-    input {
-      padding: 10px;
-      font-size: 1.2em;
-      width: 90%;
-      font-family: sans-serif;
-    }
-
-    input::placeholder-shown {
-      border-color: silver;
-    }
-
-    input::placeholder {
-      color: grey;
-    }
-</style>
-"#;
-
-static CMD_FORM: &'static str = r#"
-<form action="/" method="POST" enctype="multipart/form-data">
-    <p><input id="invite_cmd" type="text" name="cmd" placeholder="Add mersh command"/></p>
-</form>
-"#;
